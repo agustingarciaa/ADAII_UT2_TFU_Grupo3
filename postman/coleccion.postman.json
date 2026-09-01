@@ -1,0 +1,283 @@
+{
+  "info": {
+    "name": "ADAII UT2 TFU Grupo3 - Ticketing API",
+    "description": "Coleccion de la API REST del sistema de ticketing (Spring Boot, /api/v1).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "token", "value": "" },
+    { "key": "partidoId", "value": "1" },
+    { "key": "asientoId", "value": "1" },
+    { "key": "reservaId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Registrar usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"usuario@example.com\",\n  \"contrasena\": \"claveSegura123\",\n  \"nombre\": \"Usuario de prueba\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "usuarios"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sesiones",
+      "item": [
+        {
+          "name": "Iniciar sesion (login)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const data = pm.response.json();",
+                  "    pm.collectionVariables.set('token', data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"usuario@example.com\",\n  \"contrasena\": \"claveSegura123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/sesiones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "sesiones"]
+            }
+          }
+        },
+        {
+          "name": "Cerrar sesion actual",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/sesiones/actual",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "sesiones", "actual"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Partidos",
+      "item": [
+        {
+          "name": "Listar partidos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/partidos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "partidos"]
+            }
+          }
+        },
+        {
+          "name": "Obtener partido por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/partidos/{{partidoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "partidos", "{{partidoId}}"]
+            }
+          }
+        },
+        {
+          "name": "Listar asientos de un partido",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/partidos/{{partidoId}}/asientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "partidos", "{{partidoId}}", "asientos"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Precios",
+      "item": [
+        {
+          "name": "Listar politicas de precio",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/politicas-precio",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "politicas-precio"]
+            }
+          }
+        },
+        {
+          "name": "Cotizar",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"partidoId\": {{partidoId}},\n  \"asientoIds\": [{{asientoId}}],\n  \"politica\": \"precio-base\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cotizaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cotizaciones"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reservas",
+      "item": [
+        {
+          "name": "Crear reserva",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const data = pm.response.json();",
+                  "    pm.collectionVariables.set('reservaId', data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"partidoId\": {{partidoId}},\n  \"asientos\": [\n    {\n      \"asientoId\": {{asientoId}},\n      \"marcaTiempo\": \"2026-09-01T00:00:00Z\"\n    }\n  ],\n  \"politica\": \"precio-base\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reservas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reservas"]
+            },
+            "description": "marcaTiempo debe ser el valor devuelto por GET /partidos/{id}/asientos para el asiento elegido (deteccion de conflictos por timestamp)."
+          }
+        },
+        {
+          "name": "Obtener reserva propia",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reservas/{{reservaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reservas", "{{reservaId}}"]
+            }
+          }
+        },
+        {
+          "name": "Cancelar reserva",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reservas/{{reservaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reservas", "{{reservaId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Compras",
+      "item": [
+        {
+          "name": "Confirmar compra de una reserva",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reservas/{{reservaId}}/compra",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reservas", "{{reservaId}}", "compra"]
+            }
+          }
+        },
+        {
+          "name": "Listar mis entradas",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/entradas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "entradas"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Configuracion",
+      "item": [
+        {
+          "name": "Obtener configuracion de ventas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/configuracion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "configuracion"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
