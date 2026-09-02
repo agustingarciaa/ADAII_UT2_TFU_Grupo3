@@ -1,0 +1,16 @@
+services:
+  ticketing-api:
+    build:
+      context: ./demo/demo
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:sqlite:/app/data/ticketing.db
+    volumes:
+      - ticketing_data:/app/data
+      - ./demo/demo/config/ventas.properties:/app/config/ventas.properties:ro
+    restart: unless-stopped
+
+volumes:
+  ticketing_data:
